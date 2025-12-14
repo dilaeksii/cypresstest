@@ -111,7 +111,7 @@ export default function Login() {
           value={form.email}
           onChange={handleChange}
         />
-        {errors.email && <FormFeedback>{errorMessages.email}</FormFeedback>}
+        {errors.email && <FormFeedback className="errorMsg">{errorMessages.email}</FormFeedback>}
       </FormGroup>
       <FormGroup>
         <Label for="examplePassword">Password</Label>
@@ -125,7 +125,7 @@ export default function Login() {
           onChange={handleChange}
         />
         {errors.password && (
-          <FormFeedback>{errorMessages.password}</FormFeedback>
+          <FormFeedback className="errorMsg">{errorMessages.password}</FormFeedback>
         )}
       </FormGroup>
       <FormGroup check>
