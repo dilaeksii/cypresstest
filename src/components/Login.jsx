@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Button,
+  FormFeedback,
+} from "reactstrap";
 import { useHistory } from "react-router-dom";
 
 import axios from "axios";
@@ -26,10 +33,50 @@ export default function Login() {
 
   const history = useHistory();
 
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
+  useEffect(() => {
+    if(validateEmail(form.email) && form.password.trim().length >= 4 && form.terms) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  }, [form]);
+
   const handleChange = (event) => {
-    let { name, value, type } = event.target;
+    let { name, value, type, checked } = event.target;
     value = type === "checkbox" ? checked : value;
     setForm({ ...form, [name]: value });
+
+    if (name === "email") {
+      if (validateEmail(value)) {
+        setErrors({ ...errors, [name]: false });
+      } else {
+        setErrors({ ...errors, [name]: true });
+      }
+    }
+
+    if (name === "password") {
+      if (value.trim().length >= 4) {
+        setErrors({ ...errors, [name]: false });
+      } else {
+        setErrors({ ...errors, [name]: true });
+      }
+    }
+
+    if (name === "terms") {
+      if (value) {
+        setErrors({ ...errors, [name]: false });
+      } else {
+        setErrors({ ...errors, [name]: true });
+      }
+    }
   };
 
   const handleSubmit = (event) => {
@@ -39,19 +86,20 @@ export default function Login() {
       .get("https://6540a96145bedb25bfc247b4.mockapi.io/api/login")
       .then((res) => {
         const user = res.data.find(
-          (item) => item.password == form.password && item.email == form.email
+          (item) =>
+            item.form.password == form.password && item.form.email == form.email
         );
         if (user) {
           setForm(initialForm);
-          history.push("/main");
+          history.push("/success");
         } else {
-          history.push("/error");
+          alert("Email veya şifre yanlış");
         }
       });
   };
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmit}>
       <FormGroup>
         <Label htmlFor="exampleEmail">Email</Label>
         <Input
@@ -83,11 +131,14 @@ export default function Login() {
       <FormGroup check>
         <Input
           type="checkbox"
-          invalid={errors.terms}
+          name="terms"
           checked={form.terms}
           onChange={handleChange}
+          invalid={errors.terms}
         />
-        <Label check>I agree to terms of service and privacy policy</Label>
+        <Label htmlFor="terms" check>
+          I agree to terms of service and privacy policy
+        </Label>
       </FormGroup>
       <Button disabled={!isValid}>Sign In</Button>
     </Form>

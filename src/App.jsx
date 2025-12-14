@@ -4,12 +4,19 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import Login from "./components/Login.jsx";
 import Success from "./components/Success.jsx";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 function App() {
   return (
     <>
-      <Login />
-      <Success />
+      <Router>
+        <Switch>
+          <Route path="/" exact component={Login} />
+          <Route path="/success" component={Success} />
+        </Switch>
+      </Router>
     </>
   );
 }
